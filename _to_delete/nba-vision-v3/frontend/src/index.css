@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ tokens
+   Dark is the product's default and the design is built for it. A light
+   theme is defined for the same roles so `data-theme="light"` on <html>
+   swaps the whole app without touching a component.                        */
+:root {
+  --bg:            #05070F;
+  --surface:       #101A33;
+  --surface-2:     #0B1120;
+  --surface-glass: rgba(22, 35, 63, .55);
+  --border:        rgba(255, 255, 255, .09);
+  --border-strong: rgba(255, 255, 255, .16);
+  --text:          #F2F5FA;
+  --text-2:        #9FB0CC;
+  --text-muted:    #6B7C99;
+  --brand:         #1D428A;
+  --brand-lit:     #3B82F6;
+  --accent:        #C8102E;
+  --accent-lit:    #E5484D;
+  --grid:          rgba(255, 255, 255, .07);
+  --good:          #0CA30C;
+  --bad:           #D03B3B;
+  /* Neutral overlay layers. Everything that used to be a hardcoded
+     `bg-white/x` goes through these, so light mode is a token swap rather
+     than a per-component rewrite. */
+  --layer-1:       rgba(255, 255, 255, .045);
+  --layer-2:       rgba(255, 255, 255, .085);
+  --layer-3:       rgba(255, 255, 255, .150);
+  --on-layer:      #FFFFFF;
+  --hero-mid:      #FFFFFF;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg:            #F4F6FB;
+  --surface:       #FFFFFF;
+  --surface-2:     #EDF1F8;
+  --surface-glass: rgba(255, 255, 255, .72);
+  --border:        rgba(9, 20, 44, .12);
+  --border-strong: rgba(9, 20, 44, .22);
+  --text:          #0A1428;
+  --text-2:        #44567A;
+  --text-muted:    #6B7C99;
+  --brand-lit:     #2A78D6;
+  --accent-lit:    #C8102E;
+  --grid:          rgba(9, 20, 44, .10);
+  --good:          #006300;
+  --bad:           #C0272D;
+  --layer-1:       rgba(9, 20, 44, .045);
+  --layer-2:       rgba(9, 20, 44, .080);
+  --layer-3:       rgba(9, 20, 44, .140);
+  --on-layer:      #0A1428;
+  --hero-mid:      #0A1428;
+  color-scheme: light;
+}
+
+@layer base {
+  * { border-color: var(--border); }
+  html, body, #root { height: 100%; }
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  /* the arena floor: a slow navy wash behind everything */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 45% at 20% -5%,  rgba(29,66,138,.38), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 0%,   rgba(200,16,46,.16),  transparent 60%),
+      radial-gradient(ellipse 90% 60% at 50% 105%, rgba(29,66,138,.20), transparent 65%);
+  }
+  /* faint court hatch, hidden from assistive tech and print */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .32;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 20%, transparent 75%);
+  }
+  h1, h2, h3, h4, .font-display { font-family: 'Barlow Condensed', Oswald, system-ui, sans-serif; }
+  ::selection { background: var(--brand-lit); color: #fff; }
+
+  /* keyboard focus is never removed, only restyled */
+  :focus-visible {
+    outline: 2px solid var(--brand-lit);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--brand-lit); }
+}
+
+@layer components {
+  .glass {
+    background: var(--surface-glass);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 0 0 rgba(255,255,255,.05) inset,
+                0 24px 60px -28px rgba(0,0,0,.85);
+  }
+  .glass-hover {
+    transition: transform .35s cubic-bezier(.22,1,.36,1),
+                box-shadow .35s cubic-bezier(.22,1,.36,1),
+                border-color .35s;
+  }
+  .glass-hover:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-strong);
+    box-shadow: 0 1px 0 0 rgba(255,255,255,.08) inset,
+                0 0 0 1px rgba(59,130,246,.22),
+                0 30px 70px -30px rgba(29,66,138,.85);
+  }
+  .headline {
+    font-family: 'Barlow Condensed', system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -.01em;
+    text-transform: uppercase;
+    line-height: .92;
+  }
+  .eyebrow {
+    font-size: .6875rem; font-weight: 700; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--text-muted);
+  }
+  .layer-1 { background-color: var(--layer-1); }
+  .layer-2 { background-color: var(--layer-2); }
+  .layer-3 { background-color: var(--layer-3); }
+  .hover-layer-1:hover { background-color: var(--layer-1); }
+  .hover-layer-2:hover { background-color: var(--layer-2); }
+  .hover-layer-3:hover { background-color: var(--layer-3); }
+  .ring-soft { box-shadow: inset 0 0 0 1px var(--border); }
+
+  .num { font-variant-numeric: tabular-nums; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+  /* the sweep of light that runs across a card on hover */
+  .sheen { position: relative; overflow: hidden; }
+  .sheen::after {
+    content: ''; position: absolute; inset: 0; translate: -120% 0;
+    background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,.14) 50%, transparent 65%);
+    transition: translate .9s cubic-bezier(.22,1,.36,1);
+    pointer-events: none;
+  }
+  .sheen:hover::after { translate: 120% 0; }
+}
+
+/* Respect the user's motion preference everywhere, including Framer Motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}

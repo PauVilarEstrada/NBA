@@ -1,0 +1,11 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.local
+.cache/
+backend/models/*.joblib
+backend/models/*.json
+.DS_Store
