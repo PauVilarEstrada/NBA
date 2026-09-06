@@ -9,3 +9,7 @@ __pycache__/
 backend/models/*.joblib
 backend/models/*.json
 .DS_Store
+
+# local scratch, never part of the deployable project
+_to_delete/
+Claude outputs/
