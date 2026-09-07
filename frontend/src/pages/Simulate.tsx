@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import clsx from 'clsx'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { GlassCard } from '@/components/ui/GlassCard'
@@ -107,19 +107,29 @@ export default function Simulate() {
           </button>
         ) : undefined} />
 
-      <AnimatePresence mode="wait">
+      {/*
+        A keyed pane, and no `AnimatePresence`.
+        `mode="wait"` holds the incoming pane until the outgoing one reports its
+        exit — and a pane containing its own nested `AnimatePresence` (the player
+        and team pickers) never files that report, so the old pane sat at opacity
+        0 forever and the new one never mounted. That was the blank page after a
+        simulation. Changing `key` remounts the pane and framer plays it in; with
+        no exit to wait on, the transition cannot deadlock.
+      */}
+      <motion.div key={phase}
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}>
         {phase === 'loading' && home && away && (
-          <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <div>
             <GameLoader
               homeAbbr={home.abbr} homeId={home.teamId}
               awayAbbr={away.abbr} awayId={away.teamId}
               stage={progress.stage} pct={progress.pct} isPlayoffs={isPlayoffs} />
-          </motion.div>
+          </div>
         )}
 
         {phase === 'watch' && result && (
-          <motion.div key="watch" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}>
+          <div>
             {out.size > 0 && (
               <GlassCard className="mb-4" accent={tokens.series[1]}>
                 <p className="eyebrow mb-2">{t.simulate.ruledOut}</p>
@@ -140,12 +150,11 @@ export default function Simulate() {
               </GlassCard>
             )}
             <GameBroadcast result={result} onReplay={() => { const s = seed + 1; setSeed(s); run(s) }} />
-          </motion.div>
+          </div>
         )}
 
         {phase === 'setup' && (
-          <motion.div key="setup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="space-y-4">
+          <div className="space-y-4">
             {/* ------------------------------------------------ matchup */}
             <GlassCard>
               <div className="grid gap-5 lg:grid-cols-[1fr_auto_1fr]">
@@ -248,9 +257,9 @@ export default function Simulate() {
                 {t.simulate.seedNote(runs || 0)}
               </p>
             </GlassCard>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </motion.div>
     </PageTransition>
   )
 }

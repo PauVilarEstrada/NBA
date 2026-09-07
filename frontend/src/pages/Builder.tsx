@@ -110,28 +110,38 @@ export default function Builder() {
           </button>
         ) : undefined} />
 
-      <AnimatePresence mode="wait">
+      {/*
+        A keyed pane, and no `AnimatePresence`.
+        `mode="wait"` holds the incoming pane until the outgoing one reports its
+        exit — and a pane containing its own nested `AnimatePresence` (the player
+        and team pickers) never files that report, so the old pane sat at opacity
+        0 forever and the new one never mounted. That was the blank page after a
+        simulation. Changing `key` remounts the pane and framer plays it in; with
+        no exit to wait on, the transition cannot deadlock.
+      */}
+      <motion.div key={phase}
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}>
         {phase === 'loading' && (
-          <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <div>
             <GameLoader
               homeAbbr={b.userIsHome ? 'YOU' : opponent?.abbr ?? ''}
               homeId={b.userIsHome ? undefined : opponent?.teamId}
               awayAbbr={b.userIsHome ? opponent?.abbr ?? '' : 'YOU'}
               awayId={b.userIsHome ? opponent?.teamId : undefined}
               stage={stageLabel(progress.stage)} pct={progress.pct} isPlayoffs={b.isPlayoffs} />
-          </motion.div>
+          </div>
         )}
 
         {phase === 'watch' && result && (
-          <motion.div key="watch" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}>
+          <div>
             <GameBroadcast result={result}
               onReplay={() => { const s = b.seed + 1; b.setSeed(s); run(s) }} />
-          </motion.div>
+          </div>
         )}
 
         {phase === 'build' && (
-          <motion.div key="build" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <div>
             {/* ------------------------------------------------------ budget */}
             <GlassCard className="mb-5">
               <div className="flex flex-wrap items-end gap-5">
@@ -358,9 +368,9 @@ export default function Builder() {
             </div>
 
             {pool.length === 0 && <EmptyState title={t.builder.loadingPool} />}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </motion.div>
     </PageTransition>
   )
 }

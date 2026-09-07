@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import clsx from 'clsx'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { GlassCard } from '@/components/ui/GlassCard'
@@ -110,10 +110,20 @@ export default function League() {
           </div>
         ) : undefined} />
 
-      <AnimatePresence mode="wait">
+      {/*
+        A keyed pane, and no `AnimatePresence`.
+        `mode="wait"` holds the incoming pane until the outgoing one reports its
+        exit — and a pane containing its own nested `AnimatePresence` (the player
+        and team pickers) never files that report, so the old pane sat at opacity
+        0 forever and the new one never mounted. That was the blank page after a
+        simulation. Changing `key` remounts the pane and framer plays it in; with
+        no exit to wait on, the transition cannot deadlock.
+      */}
+      <motion.div key={phase}
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}>
         {phase === 'running' && (
-          <motion.div key="running" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="glass flex flex-col items-center justify-center rounded-2xl py-24 text-center">
+          <div className="glass flex flex-col items-center justify-center rounded-2xl py-24 text-center">
             <BallSpinner size={64} />
             <p className="headline mt-6 text-3xl">{t.league.playingSeason}</p>
             <p className="mt-1 text-sm" style={{ color: 'var(--text-2)' }}>{stageLabel(progress.stage)}…</p>
@@ -122,19 +132,15 @@ export default function League() {
               <motion.div className="h-full rounded-full bg-gradient-to-r from-[#3B82F6] to-[#C8102E]"
                 animate={{ width: `${Math.max(4, progress.pct)}%` }} transition={{ duration: 0.3 }} />
             </div>
-          </motion.div>
+          </div>
         )}
 
         {phase === 'result' && result && (
-          <motion.div key="result" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}>
-            <SeasonResult result={result} colors={tokens.series} />
-          </motion.div>
+          <SeasonResult result={result} colors={tokens.series} />
         )}
 
         {phase === 'setup' && (
-          <motion.div key="setup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="space-y-4">
+          <div className="space-y-4">
             <GlassCard>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
@@ -229,9 +235,9 @@ export default function League() {
                 {t.league.playSeason}
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </motion.div>
     </PageTransition>
   )
 }
