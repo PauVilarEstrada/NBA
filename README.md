@@ -1,5 +1,8 @@
 # NBA Vision
 
+## You can view the website from this link: https://nba-woat.vercel.app/
+
+###
 A full-stack NBA analytics, projection and simulation lab. Search and compare
 players and teams, look up head-to-head history split by venue, project a
 player's line against a specific defence, forecast a full game (regular season
